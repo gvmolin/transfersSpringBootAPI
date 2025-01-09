@@ -1,4 +1,4 @@
-package com.example.transfersApi.common;
+package com.example.transfersApi.utils.common;
 
 import java.util.Date;
 import java.util.UUID;
