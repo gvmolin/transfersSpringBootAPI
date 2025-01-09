@@ -1,6 +1,6 @@
 package com.example.transfersApi.models;
 
-import com.example.transfersApi.common.BaseModel;
+import com.example.transfersApi.utils.common.BaseModel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

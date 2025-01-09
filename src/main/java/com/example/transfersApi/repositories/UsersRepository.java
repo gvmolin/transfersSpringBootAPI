@@ -15,5 +15,6 @@ public interface UsersRepository extends JpaRepository<UserModel, UUID> {
   Page<UserModel> findAll(Pageable pageable);
   Page<UserModel> findByIsDeletedFalse(Pageable pageable);
   Optional<UserModel> findByIdAndIsDeletedFalse(UUID id);
+  Optional<UserModel> findByAccountNumberAndIsDeletedFalse(String accountNumber);
   Boolean existsByAccountNumber(String accountNumber);
 }
