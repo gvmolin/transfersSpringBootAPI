@@ -18,7 +18,7 @@ public class UserModel extends BaseModel {
   public String name;
 
   @Column(name = "accountNumber", unique = true, nullable = false)
-  public Integer accountNumber;
+  public String accountNumber;
 
   @Column(name = "balance", nullable = false)
   public Double balance;

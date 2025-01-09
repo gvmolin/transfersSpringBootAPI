@@ -26,6 +26,8 @@ public class UsersService {
 
   public UserModel create(UsersDTO user){
     UserModel userModel = modelMapper.map(user, UserModel.class);
+    String uniqueAccountNumber = this.generateUniqueAccountNumber();
+    userModel.setAccountNumber(uniqueAccountNumber);
     UserModel result = usersRepository.save(userModel);
     return result;
   }
@@ -58,11 +60,11 @@ public class UsersService {
   
   public Page<UserModel> findAll(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
-    return usersRepository.findAll(pageable);
+    return usersRepository.findByIsDeletedFalse(pageable);
   }
 
   public UserModel findOne(UUID id){
-    Optional<UserModel> optionalUser = usersRepository.findById(id);
+    Optional<UserModel> optionalUser = usersRepository.findByIdAndIsDeletedFalse(id);
 
     if (optionalUser.isEmpty()) {
         throw new RuntimeException("Usuário não encontrado com o ID: " + id);
@@ -70,6 +72,23 @@ public class UsersService {
 
     UserModel existingUser = optionalUser.get();
     return existingUser;
+  }
+
+  private String generateUniqueAccountNumber() {
+    String accountNumber = "";
+    boolean unique = false;
+
+    while (!unique) {
+        accountNumber = String.format("%010d", (int)(Math.random() * 1_000_000_0000L));
+
+        if (accountNumber.length() > 0 && usersRepository.existsByAccountNumber(accountNumber)) {
+            continue;
+        }
+
+        unique = true;
+    }
+
+    return accountNumber;
   }
 
 
