@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.hibernate.exception.DataException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class RulesProgram {
@@ -43,6 +45,10 @@ public class RulesProgram {
         target = rule; 
         break;  
       }
+    }
+
+    if(target == null){
+      throw new DataException("Scheduled day isnt available!", null);
     }
 
     return target; 

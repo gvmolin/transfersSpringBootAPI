@@ -3,6 +3,7 @@ package com.example.transfersApi.services;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,10 @@ public class TransfersService {
   }
 
   public TransferModel create(TransfersDTO transfer){
+    if(transfer.getOriginAccountNumber() == transfer.getDestinationAccountNumber()){
+      throw new DataException("Origin account cannot be the same as destination account!", null);
+    }
+
     TransferModel transferModel = modelMapper.map(transfer, TransferModel.class);
     Optional<UserModel> accountOrigin, accountDestination;
     
@@ -68,7 +73,7 @@ public class TransfersService {
 
   }
 
-  public TransferModel update(TransfersDTO TransferDTO, UUID id) {
+  public TransferModel update(TransfersDTO transfer, UUID id) {
     Optional<TransferModel> optionalTransfer = transfersRepository.findById(id);
 
     if (optionalTransfer.isEmpty()) {
@@ -76,9 +81,41 @@ public class TransfersService {
     }
 
     TransferModel existingTransfer = optionalTransfer.get();
-    modelMapper.map(TransferDTO, existingTransfer);
+    TransferModel transferModel = modelMapper.map(existingTransfer, TransferModel.class);
+    Optional<UserModel> accountOrigin, accountDestination;
+    
+    try {
+      accountOrigin = usersRepository.findByAccountNumberAndIsDeletedFalse(transfer.getOriginAccountNumber());
+      accountDestination = usersRepository.findByAccountNumberAndIsDeletedFalse(transfer.getDestinationAccountNumber());
 
-    return transfersRepository.save(existingTransfer);
+    } catch (Exception e) {
+      throw new RuntimeException("Erro ao buscar usuarios");
+    }
+
+    if(!accountOrigin.isEmpty() && !accountDestination.isEmpty()){
+      UserModel existingOrigin = accountOrigin.get();
+      UserModel existingDestination = accountDestination.get();
+
+      transferModel.setAccountOrigin(existingOrigin);
+      transferModel.setAccountDestination(existingDestination);
+
+    } else {
+      throw new RuntimeException("Erro ao montar dados");
+    }
+
+    Calcs calcsClass = new Calcs();
+    Double calculatedFee = calcsClass.calculateFee(transfer);
+    Double finalValue = (transfer.getOriginalValue() - calculatedFee);
+
+    transferModel.setFinalValue(finalValue);
+    transferModel.setFee(calculatedFee);
+
+    try {
+      TransferModel result = transfersRepository.save(transferModel);
+      return result;
+    } catch (Exception e) {
+      throw new RuntimeException("Erro ao salvar dados");
+    }
   }
 
   public TransferModel delete(UUID id) {
