@@ -2,7 +2,7 @@ package com.example.transfersApi.models;
 
 import java.util.Date;
 
-import com.example.transfersApi.common.BaseModel;
+import com.example.transfersApi.utils.common.BaseModel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
