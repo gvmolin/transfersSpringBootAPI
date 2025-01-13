@@ -24,7 +24,7 @@ Este projeto é uma API desenvolvida com **Spring Boot** para gerenciar transfer
 1. Clone o repositório:
 
    ```bash
-   git clone <https://github.com/gvmolin/transfersSpringBootAPI>
+   git clone https://github.com/gvmolin/transfersSpringBootAPI
    ```
 
 2. Entre no diretório do projeto:
@@ -47,12 +47,10 @@ A API estará disponível em `http://localhost:8080`.
 - Estrutura inicial ( Spring + JPA + Spring Web + H2 + Lombok)
 - Estrutura de usuários (Models, DTOs, Repository, Controller, Service, etc)
 - Validação inicial de usuários
-
 - Estrutura de transferências
 - Formulário de criação de transferências (Models, DTOs, Repository, Controller, Service, etc)
 - Rota para conferir saldo e taxas de transferência, dentro a estrutura de transferências
 - Validação inicial de transferências
-
 - Batch com tempo programável para a realização de transferências agendadadas
 - Regras de negócio facilmente editáveis aplicadas aos calculos de taxa por período
 
@@ -67,5 +65,5 @@ A API estará disponível em `http://localhost:8080`.
 - Precisão do motor de calculos
 - Sistema de autenticação
 - Registro de eventos
-- Implementação de filas e mensageria focado em escalar a organização de eventos de criação de rtansferências e atualizaçao das contas.
+- Implementação de filas e mensageria focado em escalar a organização de eventos de criação de transferências e atualizaçao das contas.
 - Sistema mais robusto para criação das queries.
