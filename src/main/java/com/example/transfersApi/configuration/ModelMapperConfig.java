@@ -1,4 +1,4 @@
-package com.example.transfersApi.config;
+package com.example.transfersApi.configuration;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
