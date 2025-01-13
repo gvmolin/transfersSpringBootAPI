@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.transfersApi.dto.CheckFeeDTO;
 import com.example.transfersApi.dto.TransfersDTO;
 import com.example.transfersApi.models.TransferModel;
 import com.example.transfersApi.models.UserModel;
@@ -32,7 +33,7 @@ public class TransfersService {
 
   public TransferModel create(TransfersDTO transfer){
     if(transfer.getOriginAccountNumber() == transfer.getDestinationAccountNumber()){
-      throw new DataException("Origin account cannot be the same as destination account!", null);
+      throw new DataException("Conta de origem nao pode ser a mesma de destino!", null);
     }
 
     TransferModel transferModel = modelMapper.map(transfer, TransferModel.class);
@@ -46,9 +47,10 @@ public class TransfersService {
       throw new RuntimeException("Erro ao buscar usuarios");
     }
 
+    UserModel existingOrigin, existingDestination;
     if(!accountOrigin.isEmpty() && !accountDestination.isEmpty()){
-      UserModel existingOrigin = accountOrigin.get();
-      UserModel existingDestination = accountDestination.get();
+      existingOrigin = accountOrigin.get();
+      existingDestination = accountDestination.get();
 
       transferModel.setAccountOrigin(existingOrigin);
       transferModel.setAccountDestination(existingDestination);
@@ -59,7 +61,11 @@ public class TransfersService {
 
     Calcs calcsClass = new Calcs();
     Double calculatedFee = calcsClass.calculateFee(transfer);
-    Double finalValue = (transfer.getOriginalValue() - calculatedFee);
+    Double finalValue = (transfer.getOriginalValue() + calculatedFee);
+
+    if(finalValue > existingOrigin.getBalance()){
+      throw new DataException("Conta de destino nao possui saldo em conta", null);
+    }
 
     transferModel.setFinalValue(finalValue);
     transferModel.setFee(calculatedFee);
@@ -71,6 +77,46 @@ public class TransfersService {
       throw new RuntimeException("Erro ao salvar dados");
     }
 
+  }
+
+  public CheckFeeDTO checkFee(TransfersDTO transfer){
+    if(transfer.getOriginAccountNumber() == transfer.getDestinationAccountNumber()){
+      throw new DataException("Conta de origem nao pode ser a mesma de destino!", null);
+    }
+
+    TransferModel transferModel = modelMapper.map(transfer, TransferModel.class);
+    Optional<UserModel> accountOrigin, accountDestination;
+    
+    try {
+      accountOrigin = usersRepository.findByAccountNumberAndIsDeletedFalse(transfer.getOriginAccountNumber());
+      accountDestination = usersRepository.findByAccountNumberAndIsDeletedFalse(transfer.getDestinationAccountNumber());
+
+    } catch (Exception e) {
+      throw new RuntimeException("Erro ao buscar usuarios");
+    }
+
+    UserModel existingOrigin, existingDestination;
+    if(!accountOrigin.isEmpty() && !accountDestination.isEmpty()){
+      existingOrigin = accountOrigin.get();
+      existingDestination = accountDestination.get();
+
+      transferModel.setAccountOrigin(existingOrigin);
+      transferModel.setAccountDestination(existingDestination);
+
+    } else {
+      throw new RuntimeException("Erro ao montar dados");
+    }
+
+    Calcs calcsClass = new Calcs();
+    Double calculatedFee = calcsClass.calculateFee(transfer);
+
+    CheckFeeDTO checkFeeDTO = new CheckFeeDTO();
+
+    checkFeeDTO.setFee(calculatedFee);
+    checkFeeDTO.setOriginAccountBalance(existingOrigin.getBalance());
+    checkFeeDTO.setFinalValue(transfer.getOriginalValue() + calculatedFee);
+
+    return checkFeeDTO;
   }
 
   public TransferModel update(TransfersDTO transfer, UUID id) {

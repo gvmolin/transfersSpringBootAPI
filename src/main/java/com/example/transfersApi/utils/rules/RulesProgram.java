@@ -14,7 +14,7 @@ public class RulesProgram {
     File jsonFile = new File("src\\main\\java\\com\\example\\transfersApi\\utils\\rules\\rulesData.json");
 
     if (!jsonFile.exists()) {
-      throw new RuntimeException("File not found: " + jsonFile.getPath());
+      throw new RuntimeException("Arquivo nao encontrado: " + jsonFile.getPath());
     }
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -23,7 +23,7 @@ public class RulesProgram {
     try {
       dataList = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, Rule.class));
     } catch (IOException e) {
-      throw new RuntimeException("Error reading the JSON file: " + e.getMessage());
+      throw new RuntimeException("Erro ao ler e mapear JSON: " + e.getMessage());
     }
 
     return dataList;
@@ -48,7 +48,7 @@ public class RulesProgram {
     }
 
     if(target == null){
-      throw new DataException("Scheduled day isnt available!", null);
+      throw new DataException("Data agendada não encontrada!", null);
     }
 
     return target; 

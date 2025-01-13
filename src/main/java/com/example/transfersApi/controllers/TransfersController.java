@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.transfersApi.dto.CheckFeeDTO;
 import com.example.transfersApi.dto.TransfersDTO;
 import com.example.transfersApi.models.TransferModel;
 import com.example.transfersApi.services.TransfersService;
@@ -30,13 +31,18 @@ public class TransfersController {
   }
 
   @PostMapping("/create")
-  public TransferModel create(@RequestBody TransfersDTO Transfer){
-    return service.create(Transfer);
+  public TransferModel create(@RequestBody TransfersDTO transfer){
+    return service.create(transfer);
+  }
+
+  @PostMapping("/check-fee")
+  public CheckFeeDTO checkFee(@RequestBody TransfersDTO transfer){
+    return service.checkFee(transfer);
   }
 
   @PutMapping("/update/{id}")
-  public TransferModel update(@PathVariable UUID id, @RequestBody TransfersDTO Transfer){
-    return service.update(Transfer, id);
+  public TransferModel update(@PathVariable UUID id, @RequestBody TransfersDTO transfer){
+    return service.update(transfer, id);
   }
 
   @DeleteMapping("/delete/{id}")
