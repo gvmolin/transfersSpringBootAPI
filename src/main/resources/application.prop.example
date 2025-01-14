@@ -1,0 +1,14 @@
+spring.application.name=transfersApi
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.datasource.username=admin
+spring.datasource.password=123
+spring.h2.console.path=/h2
+spring.h2.console.enabled=true
+spring.jpa.defer-datasource-initialization=true
+spring.kafka.bootstrap-servers=http://localhost:9092
+spring.kafka.consumer.group-id=transfersGroup
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer

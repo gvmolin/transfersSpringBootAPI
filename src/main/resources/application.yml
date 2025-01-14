@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: transfersApi
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: admin
+    password: 123
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+
+  h2:
+    console:
+      path: /h2
+      enabled: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: transfersGroup
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
