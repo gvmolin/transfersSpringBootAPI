@@ -17,6 +17,7 @@ Este projeto é uma API desenvolvida com **Spring Boot** para gerenciar transfer
 - **H2 Database**: Banco de dados em memória para desenvolvimento.
 - **ModelMapper**: Para mapeamento de objetos entre diferentes camadas da aplicação.
 - **Lombok**: Para reduzir a verbosidade do código com a geração automática de getters, setters e construtores.
+- **Kafka**: Para gerenciar filas.
 - **Maven**: Gerenciador de dependências e build.
 
 ## Como Executar o Projeto
@@ -33,7 +34,13 @@ Este projeto é uma API desenvolvida com **Spring Boot** para gerenciar transfer
    cd transfersApi
    ```
 
-3. Compile o projeto e execute a aplicação:
+3. Inicie o kafka dentro de um container Docker:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Compile o projeto e execute a aplicação:
 
    ```bash
    mvn spring-boot:run
@@ -53,6 +60,7 @@ A API estará disponível em `http://localhost:8080`.
 - Validação inicial de transferências
 - Batch com tempo programável para a realização de transferências agendadadas
 - Regras de negócio facilmente editáveis aplicadas aos calculos de taxa por período
+- Implementação de filas e mensageria focado em escalar a organização de eventos de criação de transferências e atualizaçao das contas.
 
 ### A fazer
 - Banco de dados em disco rígido
@@ -65,5 +73,5 @@ A API estará disponível em `http://localhost:8080`.
 - Precisão do motor de calculos
 - Sistema de autenticação
 - Registro de eventos
-- Implementação de filas e mensageria focado em escalar a organização de eventos de criação de transferências e atualizaçao das contas.
 - Sistema mais robusto para criação das queries.
+- Tabela de eventos
