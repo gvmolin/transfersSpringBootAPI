@@ -12,13 +12,17 @@ import org.springframework.stereotype.Service;
 
 import com.example.transfersApi.dto.CheckFeeDTO;
 import com.example.transfersApi.dto.TransfersDTO;
+import com.example.transfersApi.enums.TransferStatusEnum;
 import com.example.transfersApi.models.TransferModel;
 import com.example.transfersApi.models.UserModel;
 import com.example.transfersApi.repositories.TransfersRepository;
 import com.example.transfersApi.repositories.UsersRepository;
 import com.example.transfersApi.utils.calcs.Calcs;
 
+import lombok.extern.log4j.Log4j2;
+
 @Service
+@Log4j2
 public class TransfersService {
 
   private final TransfersRepository transfersRepository; 
@@ -191,6 +195,49 @@ public class TransfersService {
 
     TransferModel existingTransfer = optionalTransfer.get();
     return existingTransfer;
+  }
+
+  public void ProcessTransfer(UUID transferId){
+    log.info("------------------------");
+
+      TransferModel scheduled = this.findOne(transferId);
+
+      log.info("Processando " + scheduled.getId() + " transferencia agendada...");
+      log.info("Conta de origem: " + scheduled.getAccountOrigin());
+      log.info("Conta de destino " + scheduled.getAccountDestination());
+
+      Optional<UserModel> accountDestination = this.usersRepository.findByAccountNumberAndIsDeletedFalse(scheduled.getAccountDestination().getAccountNumber());
+      Optional<UserModel> accountOrigin = this.usersRepository.findByAccountNumberAndIsDeletedFalse(scheduled.getAccountOrigin().getAccountNumber());
+
+      if(accountDestination.isEmpty() || accountOrigin.isEmpty()){
+        scheduled.setStatus(TransferStatusEnum.ERROR);
+        log.error("Erro ao buscar por contas relatadas na transferência.");
+
+      } else if (accountOrigin.get().getBalance() < scheduled.getFinalValue()) {
+        scheduled.setStatus(TransferStatusEnum.ERROR);
+        log.error("Erro no processamento de transferência, usuario '" + accountOrigin.get().getAccountNumber() + "' não possui saldo suficiente.");
+
+      } else {
+        UserModel userOriginModel = accountOrigin.get();
+        UserModel userDestinationModel = accountDestination.get();
+
+        log.info("Valor solicitado na transacao " + scheduled.getOriginalValue());
+        log.info("Valor final da transação " + scheduled.getFinalValue());
+
+        userOriginModel.setBalance(accountOrigin.get().getBalance() - scheduled.getFinalValue());
+        userDestinationModel.setBalance(accountDestination.get().getBalance() + scheduled.getFinalValue());
+
+        usersRepository.save(userOriginModel);
+        usersRepository.save(userDestinationModel);
+
+        scheduled.setStatus(TransferStatusEnum.FINISHED);
+      }
+
+      scheduled.setAttempts(scheduled.getAttempts() + 1);
+      transfersRepository.save(scheduled);
+      
+      log.info("Finalizando processamento de transferência agendada");
+      log.info("------------------------");
   }
 
 
